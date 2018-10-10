@@ -1,6 +1,6 @@
 /**
- * 源码名称：placeholder.js
- * 实现功能：让低版本的浏览器(主要是IE8)支持placeholder
+ * 源码名称：FrameController.js
+ * 实现功能：优雅的处理单页多框架（<iframe>）窗口管理同步问题
  * 作者主页：http://www.miaoqiyuan.cn/
  * 联系邮箱：mqycn@126.com
  * 使用说明：http://www.miaoqiyuan.cn/p/framecontroller-js
