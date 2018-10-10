@@ -1,37 +1,69 @@
 # FrameController.js
 
 #### 项目介绍
-一个 网页 框架（ <iframe>）管理项目
-
-#### 软件架构
-软件架构说明
-
+优雅的处理单页多框架（<iframe>）窗口管理同步问题
 
 #### 安装教程
 
-1. xxxx
-2. xxxx
-3. xxxx
+下载后安装到 网站的任意目录，打开 http://您的域名/安装路径/demo/demo.html 即可进行测试。（因为本地浏览器会显示iframe，所以必须放到Web服务器中）
+
+在线测试地址：[http://www.miaoqiyuan.cn/products/frame-controller/](http://www.miaoqiyuan.cn/products/frame-controller/)
+
 
 #### 使用说明
 
-1. xxxx
-2. xxxx
-3. xxxx
+1、点击发送通知，所有打开的内嵌页都会受到通知。
 
-#### 参与贡献
-
-1. Fork 本项目
-2. 新建 Feat_xxx 分支
-3. 提交代码
-4. 新建 Pull Request
+![基础事件](https://images.gitee.com/uploads/images/2018/1010/212326_aa125905_82383.gif "d1.gif")
 
 
-#### 码云特技
+```
+FrameController.addListener('broadcast', function(e) {
+    $('#msg').val(e.data.msg);
+    console.log(e.frameId, e.event, e.data);
+});
 
-1. 使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2. 码云官方博客 [blog.gitee.com](https://blog.gitee.com)
-3. 你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解码云上的优秀开源项目
-4. [GVP](https://gitee.com/gvp) 全称是码云最有价值开源项目，是码云综合评定出的优秀开源项目
-5. 码云官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6. 码云封面人物是一档用来展示码云会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+//发送广播
+$('#send').click(function() {
+    var nums = FrameController.broadcast('broadcast', {
+        msg: $('#msg').val()
+    });
+    console.log('通知成功:', nums);
+});
+```
+
+
+2、新增 内嵌页，关闭内嵌页，可以通过：FrameController.addListener('frame.add',func)、FrameController.addListener('frame.remove',func) 进行监听
+
+![新开、关闭事件](https://images.gitee.com/uploads/images/2018/1010/212444_95495d03_82383.gif "d2.gif")
+
+```
+//监听系统事件
+FrameController.addListener('frame.remove', function(e) {
+    console.log(e.frameId, e.event, e.data);
+});
+FrameController.addListener('frame.add', function(e) {
+    console.log(e.frameId, e.event, e.data);
+});
+```
+
+3、可以对一个事件增加多个监听方法，可以删除所有监听方法、删除某一个监听方法
+
+![事件添加和删除](https://images.gitee.com/uploads/images/2018/1010/212557_3b6ee6f1_82383.gif "d3.gif")
+```
+var msgEventListener = function(e) {
+    console.log(e);
+};
+
+//添加自定义事件
+$('#add_custom').click(function() {
+    FrameController.addListener('event', msgEventListener);
+});
+
+//删除自定义事件
+$('#remove_custom').click(function() {
+    FrameController.removeListener('event', msgEventListener);
+});
+```
+
+
