@@ -1,3 +1,11 @@
+/**
+ * 源码名称：placeholder.js
+ * 实现功能：让低版本的浏览器(主要是IE8)支持placeholder
+ * 作者主页：http://www.miaoqiyuan.cn/
+ * 联系邮箱：mqycn@126.com
+ * 使用说明：http://www.miaoqiyuan.cn/p/framecontroller-js
+ * 最新版本：https://gitee.com/mqycn/FrameController.js
+ */
 (function() {
 
     if (window.top == window.self) {
