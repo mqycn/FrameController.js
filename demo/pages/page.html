@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <title>Frame页</title>
+    <style type="text/css">
+    div.inputs {
+        padding: 0 0 5px;
+    }
+
+    input {
+        width: 80px;
+    }
+
+    textarea {
+        background: #FAFAFA;
+        width: 98%;
+        height: 240px;
+    }
+    </style>
+    <script type="text/javascript" src="../../src/FrameController.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+</head>
+
+<body>
+    <div class="inputs">
+        <input id="msg">
+        <button id="send">发送通知</button>
+        <button id="remove">取消所有</button>
+        <button id="add_custom">添加事件</button>
+        <button id="remove_custom">删除事件</button>
+        <button id="count">个数</button>
+    </div>
+    <div class="log">
+        <textarea id="log"></textarea>
+    </div>
+    <script type="text/javascript">
+    $(function() {
+
+        //兼容IE7
+        window.JSON = window.JSON || {
+            stringify: function(data) {
+                return data.toString();
+            }
+        };
+
+        var logTpl = '事件:#EVENT# 来源:#SOURCE#\n数据:#DATA#\n\n',
+            addLog = function(from, event, data) {
+                var _old = $('#log').html().substring(0, 3000);
+                $('#log').html(
+                    (logTpl + _old)
+                    .replace('#EVENT#', event)
+                    .replace('#DATA#', JSON.stringify(data))
+                    .replace('#SOURCE#', from)
+                );
+                console.log('event：', event, 'data:', data);
+            },
+            msgEventListener = function(e) {
+                $('#log').html('自定义事件已经触发，添加多次会触发多次\n\n' + $('#log').html());
+            };
+
+        //同步通知
+        FrameController.addListener('broadcast', function(e) {
+            $('#msg').val(e.data.msg);
+            addLog(e.frameId, e.event, e.data);
+        });
+
+        //发送广播
+        $('#send').click(function() {
+            var nums = FrameController.broadcast('broadcast', {
+                msg: $('#msg').val()
+            });
+            $('#log').html('通知成功:' + nums + '\n\n' + $('#log').html());
+        });
+
+        //取消所有事件
+        $('#remove').click(function() {
+            FrameController.removeAllListener();
+        });
+
+        //更新输入状态
+        $('#msg').change(function() {
+            FrameController.broadcast('change', {
+                text: '输入框内容已更改:' + $(this).val()
+            });
+        });
+
+        //更新状态
+        FrameController.addListener('change', function(e) {
+            addLog(e.frameId, e.event, e.data);
+        });
+
+        //添加自定义事件
+        $('#add_custom').click(function() {
+            FrameController.addListener('broadcast', msgEventListener);
+        });
+
+        //删除自定义事件
+        $('#remove_custom').click(function() {
+            FrameController.removeListener('broadcast', msgEventListener);
+        });
+
+        //获取窗口个数
+        $('#count').click(function() {
+            alert('当前打开 ' + FrameController.count() + ' 个窗口');
+        });
+
+        //监听系统事件
+        FrameController.addListener('frame.remove', function(e) {
+            addLog(e.frameId, e.event, e.data);
+        });
+        FrameController.addListener('frame.add', function(e) {
+            addLog(e.frameId, e.event, e.data);
+        });
+
+    });
+    </script>
+</body>
+
+</html>
