@@ -20,8 +20,6 @@
                     _count: 1 //窗口ID
                 };
 
-            window._data = data;
-
             /**
              * 获取新的窗口编号
              */
