@@ -147,31 +147,27 @@
                 listenerPrefix = '';
             }
 
-            //获取窗口数量
-            var getCount = function() {
-                return FrameController.broadcast('frame._online') + 1;
-            };
-
-            window[listenerName](listenerPrefix + 'load', function() {
-
-                //窗口注册事件
-                FrameController.broadcast('frame.add', {
-                    msg: '新增窗口'
-                });
-
-                //计数事件，仅用于统计框架数
-                FrameController.addListener('frame._online', function() {});
+            //窗口注册事件
+            broadcast('frame.add', {
+                msg: '新增窗口'
             });
+            
 
+            //窗口关闭事件
             window[listenerName]('unload', function() {
-
-                //窗口关闭事件
                 FrameController.broadcast('frame.remove', {
                     msg: '关闭窗口'
                 });
                 FrameController.removeAllListener();
-
             });
+
+            //获取窗口数量
+            window[listenerName](listenerPrefix + 'load', function() {
+                FrameController.addListener('frame._online', function() {});
+            });
+            var getCount = function() {
+                return FrameController.broadcast('frame._online') + 1;
+            };
 
             //兼容IE8和之前的浏览器
             var bindFrameData = function(func) {
