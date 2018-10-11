@@ -26,6 +26,7 @@
 <body>
     <div class="inputs">
         <input id="msg">
+        <input type="hidden" name="__token__" value="{:token()}">
         <button id="send">发送通知</button>
         <button id="remove">取消所有</button>
         <button id="add_custom">添加事件</button>
@@ -45,19 +46,22 @@
             }
         };
 
-        var logTpl = '事件:#EVENT# 来源:#SOURCE#\n数据:#DATA#\n\n',
+        var logTpl = '事件:#EVENT# 来源:#SOURCE#\n数据:#DATA#',
             addLog = function(from, event, data) {
                 var _old = $('#log').html().substring(0, 3000);
-                $('#log').html(
-                    (logTpl + _old)
+                showLog(
+                    logTpl
                     .replace('#EVENT#', event)
                     .replace('#DATA#', JSON.stringify(data))
                     .replace('#SOURCE#', from)
                 );
                 console.log('event：', event, 'data:', data);
             },
+            showLog = function(text){
+                $('#log').html(text + '\n\n' + $('#log').html());
+            },
             msgEventListener = function(e) {
-                $('#log').html('自定义事件已经触发，添加多次会触发多次\n\n' + $('#log').html());
+                showLog('自定义事件已经触发，添加多次会触发多次');
             };
 
         //同步通知
@@ -71,7 +75,7 @@
             var nums = FrameController.broadcast('broadcast', {
                 msg: $('#msg').val()
             });
-            $('#log').html('通知成功:' + nums + '\n\n' + $('#log').html());
+            showLog('通知成功:' + nums);
         });
 
         //取消所有事件
@@ -111,6 +115,22 @@
             addLog(e.frameId, e.event, e.data);
         });
         FrameController.addListener('frame.add', function(e) {
+            addLog(e.frameId, e.event, e.data);
+        });
+
+        //模拟ThinkPHP Token
+        $('input[name=__token__]').val(new Date().getTime());
+
+        //ThinkPHP Token 广播
+        FrameController.broadcast('token', {
+            token: $('input[name=__token__]').val(),
+            desc: '模拟 ThinkPHP 页面自动 :token() '
+        });
+
+        //收到 ThinkPHP Token 处理
+        FrameController.addListener('token', function(e) {
+            $('input[name=__token__]').val(e.data.token);
+            showLog('新的Token：' + $('input[name=__token__]').val());
             addLog(e.frameId, e.event, e.data);
         });
 
